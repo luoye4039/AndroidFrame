@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.seven.framework.widget.loadingindicatorview.AVLoadingIndicatorView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_loding_aliv"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:indicator="BallTrianglePath" />
