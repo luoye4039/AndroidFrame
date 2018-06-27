@@ -12,25 +12,16 @@
  */
 package com.seven.framework.utils;
 
-import android.content.Context;
 import android.widget.Toast;
+
+import com.seven.framework.base.BaseApplication;
 
 
 /**
  * Toast工具类
  */
 public class ToastUtil {
-    private static Toast toast;
     public static boolean isShow;
-
-    /**
-     * 初始化
-     *
-     * @param context
-     */
-    public static void intToastUtil(Context context) {
-        toast = new Toast(context);
-    }
 
     /**
      * 文本toast
@@ -62,9 +53,7 @@ public class ToastUtil {
     }
 
     private static void showMess(String msg, int time) {
-        toast.setText(msg);
-        toast.setDuration(time);
-        toast.show();
+        Toast.makeText(BaseApplication.sBaseApplication, msg, time).show();
     }
 
     /**
@@ -97,8 +86,6 @@ public class ToastUtil {
     }
 
     private static void showMess(int msg, int time) {
-        toast.setText(msg);
-        toast.setDuration(time);
-        toast.show();
+        Toast.makeText(BaseApplication.sBaseApplication, msg, time).show();
     }
 }

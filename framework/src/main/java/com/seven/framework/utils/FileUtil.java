@@ -2,12 +2,16 @@ package com.seven.framework.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,17 +19,52 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.text.DecimalFormat;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.os.Environment.MEDIA_MOUNTED;
+
 /**
- * 文件工具
  * Created by wangbin on 2016/11/22.
+ * 文件处理工具类
  */
 
 public class FileUtil {
+    private static final String EXTERNAL_STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
+
+    /**
+     * 获取缓存文件地址
+     * @param context
+     * @param cacheDir
+     * @return
+     */
+    public static File getOwnCacheDirectory(Context context, String cacheDir) {
+        File appCacheDir = null;
+        if (MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) && hasExternalStoragePermission(context)) {
+            appCacheDir = new File(Environment.getExternalStorageDirectory(), cacheDir);
+        }
+        if (appCacheDir == null || (!appCacheDir.exists() && !appCacheDir.mkdirs())) {
+            appCacheDir = context.getCacheDir();
+        }
+        return appCacheDir;
+    }
+
+    /**
+     * 有没有存储权限
+     * @param context
+     * @return
+     */
+    private static boolean hasExternalStoragePermission(Context context) {
+        int perm = context.checkCallingOrSelfPermission(EXTERNAL_STORAGE_PERMISSION);
+        return perm == PackageManager.PERMISSION_GRANTED;
+    }
+
+
     /**
      * 指定文件夹创建文件
      *
@@ -39,18 +78,6 @@ public class FileUtil {
             destDir.mkdirs();
         }
         return new File(folderPath, fileName);
-    }
-
-    /**
-     * 根据文件绝对路径获取文件名（带扩展名）
-     *
-     * @param filePath 文件path
-     * @return 文件名
-     */
-    public static String getFileName(String filePath) {
-        if (TextUtils.isEmpty(filePath))
-            return "";
-        return filePath.substring(filePath.lastIndexOf(File.separator) + 1);
     }
 
     /**
@@ -69,6 +96,18 @@ public class FileUtil {
             return "";
         }
         return fileName.substring(point + 1);
+    }
+
+    /**
+     * 根据文件绝对路径获取文件名（带扩展名）
+     *
+     * @param filePath 文件path
+     * @return 文件名
+     */
+    public static String getFileName(String filePath) {
+        if (TextUtils.isEmpty(filePath))
+            return "";
+        return filePath.substring(filePath.lastIndexOf(File.separator) + 1);
     }
 
     /**
@@ -95,10 +134,8 @@ public class FileUtil {
      */
     public static long getFileSize(String filePath) {
         long size = 0;
-        if (TextUtils.isEmpty(filePath))
-            return size;
         File file = new File(filePath);
-        if (file.exists()) {
+        if (file != null && file.exists()) {
             size = file.length();
         }
         return size;
@@ -111,7 +148,7 @@ public class FileUtil {
      * @return B/KB/MB/GB 返回合适的大小字符串
      */
     public static String formatFileSize(long fileSize) {
-        DecimalFormat df = new DecimalFormat("#.00");
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#.0");
         String fileSizeString = "";
         if (fileSize < 1024) {
             fileSizeString = df.format((double) fileSize) + "B";
@@ -173,13 +210,12 @@ public class FileUtil {
     /**
      * 写文本文件 在Android系统中，文件保存在 /data/data/PACKAGE_NAME/files 目录下
      *
-     * @param context  context
-     * @param fileName 文件名
-     * @param content  文本内容
+     * @param context
+     * @param fileName
      */
     public static void writeToDataFile(Context context, String fileName, String content) {
-        if (TextUtils.isEmpty(content))
-            return;
+        if (content == null)
+            content = "";
         try {
             FileOutputStream fos = context.openFileOutput(fileName,
                     Context.MODE_PRIVATE);
@@ -191,7 +227,7 @@ public class FileUtil {
     }
 
     /**
-     * 读取文本文件 在Android系统中，文件保存在 /data/data/PACKAGE_NAME/files 目录下
+     * 读取文本文件
      *
      * @param context
      * @param fileName
@@ -207,12 +243,6 @@ public class FileUtil {
         return "";
     }
 
-    /**
-     * 将流中的数据转成字符串
-     *
-     * @param inStream
-     * @return
-     */
     public static String readInStream(InputStream inStream) {
         try {
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -425,7 +455,8 @@ public class FileUtil {
                     path = cur.getString(dataIdx);
                 }
                 cur.close();
-                if (index != 0) {
+                if (index == 0) {
+                } else {
                     Uri u = Uri.parse("content://media/external/images/media/" + index);
                     System.out.println("temp uri is :" + u);
                 }
@@ -450,13 +481,7 @@ public class FileUtil {
         return null;
     }
 
-    /**
-     * 将字节保存到本地
-     *
-     * @param filePath
-     * @param bytes
-     */
-    public static void saveFile(byte[] bytes, String filePath) {
+    public static void saveFile(String filePath, byte[] bytes) {
         try {
             File file = new File(filePath);
             if (!file.exists())
@@ -468,24 +493,16 @@ public class FileUtil {
         }
     }
 
-
-    /**
-     * 将读取的流写到文件中
-     *
-     * @param filePath
-     * @param inputStream
-     */
-    public static void writeToFile(String filePath, InputStream inputStream) {
-        int bytesWritten = 0;
+    public static boolean writeToFile(String filePath, InputStream inputStream) {
         int byteCount = 0;
         byte[] bytes = new byte[1024];
         OutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(filePath);
             while ((byteCount = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, bytesWritten, byteCount);
-                bytesWritten += byteCount;
+                outputStream.write(bytes, 0, byteCount);
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -496,17 +513,97 @@ public class FileUtil {
                 e.printStackTrace();
             }
         }
+        return false;
     }
 
-    /**
-     * 复制文件
-     *
-     * @param srcPath
-     * @param tarPath
-     * @return
-     */
+    public static String readAssetData(Context context, String fileName) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            AssetManager assetManager = context.getAssets();
+            BufferedReader bf = new BufferedReader(new InputStreamReader(
+                    assetManager.open(fileName)));
+            String line;
+            while ((line = bf.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+    }
+
+
+    public static void writeToFile(String filePath, byte[] data) {
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            // Log.d("TestFile", "Create the file:" + strFilePath);
+            file.getParentFile().mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        RandomAccessFile raf = null;
+        try {
+            raf = new RandomAccessFile(file, "rwd");
+            raf.seek(file.length());
+            raf.write(data);
+            raf.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                raf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static byte[] readFile(String filename) {
+
+        File f = new File(filename);
+        if (!f.exists()) {
+            // throw new FileNotFoundException(filename);
+        }
+
+        FileChannel channel = null;
+        FileInputStream fs = null;
+        try {
+            fs = new FileInputStream(f);
+            channel = fs.getChannel();
+            ByteBuffer byteBuffer = ByteBuffer.allocate((int) channel.size());
+            while ((channel.read(byteBuffer)) > 0) {
+                // do nothing
+                // System.out.println("reading");
+            }
+            return byteBuffer.array();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // throw e;
+        } finally {
+            try {
+                channel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                fs.close();
+            } catch (IOException e) {
+                // e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public static boolean copyFile(String srcPath, String tarPath) {
         File srcFile = new File(srcPath);
+
         // 判断源文件是否存在
         if (!srcFile.exists()) {
             return false;
@@ -517,8 +614,10 @@ public class FileUtil {
         File destFile = new File(tarPath);
         if (destFile.exists()) {
             // 如果目标文件存在并允许覆盖
+
             // 删除已经存在的目标文件，无论目标文件是目录还是单个文件
             new File(tarPath).delete();
+
         } else {
             // 如果目标文件所在目录不存在，则创建目录
             if (!destFile.getParentFile().exists()) {
@@ -537,6 +636,7 @@ public class FileUtil {
             in = new FileInputStream(srcFile);
             out = new FileOutputStream(destFile);
             byte[] buffer = new byte[1024];
+
             while ((byteread = in.read(buffer)) != -1) {
                 out.write(buffer, 0, byteread);
             }
