@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.seven.framework.R;
-import com.seven.framework.utils.DeviceManufacturerUtil;
+import com.seven.framework.utils.DeviceInfo;
 import com.seven.framework.utils.ToastUtil;
 
 
@@ -124,7 +124,7 @@ public class FloatNotifycation {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return Settings.canDrawOverlays(context);
         } else {
-            if (DeviceManufacturerUtil.deviceIsMIUI() || DeviceManufacturerUtil.deviceIsFlyme()) {
+            if (DeviceInfo.deviceIsMIUI() || DeviceInfo.deviceIsFlyme()) {
                 return MeizuMiuiFloatViewPermission.isMiuiFloatWindowOpAllowed(context);
             } else {
                 return true;
@@ -143,7 +143,7 @@ public class FloatNotifycation {
                     Uri.parse("package:" + activity.getPackageName()));
             activity.startActivityForResult(intent, REQUEST_FOLAT_PREMISSION);
         } else {
-            if (DeviceManufacturerUtil.deviceIsMIUI()) {
+            if (DeviceInfo.deviceIsMIUI()) {
                 MeizuMiuiFloatViewPermission.openMiuiPermissionActivity(activity, REQUEST_FOLAT_PREMISSION);
             } else {
                 try {

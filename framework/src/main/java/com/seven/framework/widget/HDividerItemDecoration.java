@@ -9,15 +9,15 @@ import android.view.View;
 /**
  * Created by wangbin on 2016-5-16.
  */
-public class VDividerItemDecoration extends RecyclerView.ItemDecoration {
+public class HDividerItemDecoration extends RecyclerView.ItemDecoration {
     private int space;
     private ColorDrawable mDivider;
 
-    public VDividerItemDecoration(int space) {
+    public HDividerItemDecoration(int space) {
         this.space = space;
     }
 
-    public VDividerItemDecoration(int color, int space) {
+    public HDividerItemDecoration(int color, int space) {
         if (color != 0) {
             mDivider = new ColorDrawable(color);
         }
@@ -28,7 +28,7 @@ public class VDividerItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         if (parent.getChildAdapterPosition(view) > 0)
-            outRect.bottom = space;
+            outRect.right = space;
     }
 
     @Override
@@ -38,12 +38,14 @@ public class VDividerItemDecoration extends RecyclerView.ItemDecoration {
         if (mDivider == null || childCount == 0) {
             return;
         }
-        int left = parent.getPaddingLeft();
-        int right = parent.getWidth() - parent.getPaddingRight();
+        int top = parent.getPaddingTop();
+        int bottom = parent.getHeight() - parent.getPaddingBottom();
         for (int i = 0; i < childCount - 1; i++) {
-            View child = parent.getChildAt(i);
-            int top = child.getBottom();
-            int bottom = child.getBottom() + space;
+            final View child = parent.getChildAt(i);
+            int left;
+            int right;
+            left = child.getRight();
+            right = child.getRight() + space;
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
         }
