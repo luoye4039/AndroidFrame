@@ -7,6 +7,14 @@ package com.seven.framework.base.mvp;
 public class BasePresenter<V extends BaseView> {
     private V mView;
 
+    public V getView() {
+        return mView;
+    }
+
+    public void setView(V view) {
+        mView = view;
+    }
+
     public boolean isAttachView() {
         return mView != null;
     }

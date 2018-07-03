@@ -21,13 +21,13 @@ import java.util.List;
 public class CommonSelectDialog extends Dialog {
 
     private VRecyclerView mSelectDialogVrv;
-    private OnClickListener mOnClickListener;
+    private OnItemClickListener mOnClickListener;
 
-    public OnClickListener getOnClickListener() {
+    public OnItemClickListener getOnClickListener() {
         return mOnClickListener;
     }
 
-    public void setOnClickListener(OnClickListener onClickListener) {
+    public void setOnClickListener(OnItemClickListener onClickListener) {
         mOnClickListener = onClickListener;
     }
 
@@ -80,7 +80,44 @@ public class CommonSelectDialog extends Dialog {
     }
 
 
-    public interface OnClickListener {
+    public interface OnItemClickListener {
         void onClickItem(View view, int position, SelectDialogBean selectBean);
     }
+
+    public static class Builder {
+        private Context mContext;
+        private List<SelectDialogBean> mSelectDialogBeans;
+        private OnItemClickListener mOnItemClickListener;
+
+        public Builder(Context context) {
+            mContext = context;
+        }
+
+        public Builder setData(@NonNull String[] strings) {
+            ArrayList<SelectDialogBean> selectBeans = new ArrayList<>();
+            for (int i = 0; i < strings.length; i++) {
+                selectBeans.add(new SelectDialogBean(i, strings[i]));
+            }
+            mSelectDialogBeans = selectBeans;
+            return this;
+        }
+
+        public Builder setData(final List<SelectDialogBean> selectBeanList) {
+            mSelectDialogBeans = selectBeanList;
+            return this;
+        }
+
+        public Builder setOnItemClickListener(OnItemClickListener onItemClickListener) {
+            mOnItemClickListener = onItemClickListener;
+            return this;
+        }
+
+        public CommonSelectDialog build() {
+            CommonSelectDialog commonSelectDialog = new CommonSelectDialog(mContext);
+            commonSelectDialog.setData(mSelectDialogBeans);
+            commonSelectDialog.setOnClickListener(mOnItemClickListener);
+            return commonSelectDialog;
+        }
+    }
+
 }

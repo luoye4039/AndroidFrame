@@ -1,6 +1,7 @@
 package com.seven.framework.utils;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +9,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;

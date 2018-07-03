@@ -1,4 +1,8 @@
 <resources>
     <string name="please_open_float_view_permission">请到设置中打开悬浮窗权限</string>
     <string name="copy_success_tips">已复制至粘贴板</string>
+    <string name="tips_small_volume">当前音量较小，请调大音量</string>
+    <string name="ablum">相册</string>
+    <string name="camera">拍照</string>
+    <string name="cancle">取消</string>
 </resources>

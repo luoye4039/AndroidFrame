@@ -17,4 +17,5 @@
     <color name="color_d7">#D7D7D7</color>
     <color name="color_f2">#F2F2F2</color>
     <color name="color_f0">#F0F0F0</color>
+    <color name="line_color">#EEEEEE</color>
 </resources>
