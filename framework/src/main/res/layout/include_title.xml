@@ -6,7 +6,6 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/title_ll_left"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -36,7 +35,6 @@
 
 
     <LinearLayout
-        android:id="@+id/center_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -69,7 +67,6 @@
 
 
     <LinearLayout
-        android:id="@+id/title_ll_right"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"

@@ -1,13 +1,12 @@
 package com.seven.framework.view.adapter;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.widget.Button;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.seven.framework.R;
-import com.seven.framework.base.SelectDialogBean;
+import com.seven.framework.entity.SelectDialogBean;
 
 import java.util.List;
 

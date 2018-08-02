@@ -14,6 +14,7 @@ import android.view.View;
 import com.seven.framework.R;
 import com.seven.framework.base.mvp.BasePresenter;
 import com.seven.framework.base.mvp.BaseView;
+import com.seven.framework.entity.SelectDialogBean;
 import com.seven.framework.permissions.rxpermissions.RxPermissions;
 import com.seven.framework.utils.BitmapUtil;
 import com.seven.framework.utils.DateUtil;
@@ -23,7 +24,6 @@ import com.seven.framework.utils.SystemUtil;
 import com.seven.framework.view.dialog.CommonSelectDialog;
 
 import java.io.File;
-import java.util.List;
 
 import io.reactivex.functions.Consumer;
 

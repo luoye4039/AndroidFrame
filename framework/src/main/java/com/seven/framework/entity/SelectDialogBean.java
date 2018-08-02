@@ -1,4 +1,4 @@
-package com.seven.framework.base;
+package com.seven.framework.entity;
 
 import java.io.Serializable;
 

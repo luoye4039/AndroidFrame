@@ -51,7 +51,7 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
     }
 
     /**
-     * 设置是否使用软加载
+     * 设置是否使用软加载  在onCreateView 内使用
      *
      * @param userLazyLoad
      */
@@ -79,48 +79,64 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
         mBaseFragmentView = inflater.inflate(R.layout.fragment_base, container, false);
         mBaseAbl = mBaseFragmentView.findViewById(R.id.base_abl);
         mBaseFlContent = mBaseFragmentView.findViewById(R.id.base_fl_content);
-        if (mContentView != null) {
-            mBaseFlContent.addView(mContentView);
-        }
         return mBaseFragmentView;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        isViewCreated = true;
+        if (!isUserLazyLoad()) {
+            onCreatPresenter();
+            if (mPresenter != null)
+                mPresenter.attachView((V) this);
+            initData();
+            initView();
+            initServiceData();
+        }
+    }
+
     /**
-     * 设置显示内容
+     * 创建Presenter
+     */
+    public abstract void onCreatPresenter();
+
+    /**
+     * 设置显示内容  onViewCreated中使甩
      *
      * @param resourceId
      */
     public void setContentView(int resourceId) {
-        if (mActivity == null)
-            return;
-        mContentView = LayoutInflater.from(mActivity.getApplicationContext()).inflate(resourceId, mBaseFlContent, false);
+        mContentView = LayoutInflater.from(BaseApplication.sBaseApplication).inflate(resourceId, mBaseFlContent, false);
+        if (mBaseFlContent != null)
+            mBaseFlContent.addView(mContentView);
     }
 
     /**
-     * 设置显示内容
+     * 设置显示内容 onViewCreated中使甩
      *
      * @param view
      */
     public void setContentView(View view) {
         mContentView = view;
+        if (mBaseFlContent != null)
+            mBaseFlContent.addView(mContentView);
     }
 
 
     /**
-     * 添加通用title
+     * 添加通用title onViewCreated中使甩
      *
      * @param layoutResID layoutid
      */
     public void addTitleView(int layoutResID) {
-        if (mActivity == null)
-            return;
         if (mBaseAbl.getChildCount() > 0)
             mBaseAbl.removeAllViews();
-        mBaseAbl.addView(LayoutInflater.from(mActivity.getApplicationContext()).inflate(layoutResID, mBaseAbl, false));
+        mBaseAbl.addView(LayoutInflater.from(BaseApplication.sBaseApplication).inflate(layoutResID, mBaseAbl, false));
     }
 
     /**
-     * 添加通用title
+     * 添加通用title onViewCreated中使甩
      *
      * @param view view
      */
@@ -131,20 +147,18 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
     }
 
     /**
-     * 设置数据为空或者网络异常界面
+     * 设置数据为空或者网络异常界面 onViewCreated中使甩
      *
      * @param emptyResourceId
      * @param netResourceId
      */
     public void setDataEmptyView(int emptyResourceId, int netResourceId) {
-        if (mActivity== null)
-            return;
-        mDataEmptyView = LayoutInflater.from(mActivity.getApplicationContext()).inflate(emptyResourceId, null, false);
-        mNetExceptionView = LayoutInflater.from(mActivity.getApplicationContext()).inflate(netResourceId, null, false);
+        mDataEmptyView = LayoutInflater.from(BaseApplication.sBaseApplication).inflate(emptyResourceId, null, false);
+        mNetExceptionView = LayoutInflater.from(BaseApplication.sBaseApplication).inflate(netResourceId, null, false);
     }
 
     /**
-     * 设置数据为空或者网络异常界面
+     * 设置数据为空或者网络异常界面 onViewCreated中使甩
      *
      * @param emptyView
      * @param netExceptionView
@@ -154,23 +168,6 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
         mNetExceptionView = netExceptionView;
     }
 
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        isViewCreated = true;
-        if (!isUserLazyLoad()) {
-            onCreatPresenter();
-            if (mPresenter != null)
-                mPresenter.attachView((V) this);
-        }
-    }
-
-
-    /**
-     * 创建Presenter
-     */
-    public abstract void onCreatPresenter();
 
     /**
      * 用于初始化各种数据
@@ -198,78 +195,73 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
                 onCreatPresenter();
                 if (mPresenter != null)
                     mPresenter.attachView((V) this);
-                lazyLoadData();
+                initData();
+                initView();
+                initServiceData();
             }
         }
     }
 
-    /**
-     * 加载数据
-     */
-    public abstract void lazyLoadData();
-
 
     /**
-     * 显示数据为空View
+     * 设置是否显示空界面
      */
-    public void showEmptyDataView() {
+    @Override
+    public void setEmptyDataViewVisiable(boolean visiable) {
         if (mDataEmptyView == null)
             return;
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
+        if (visiable) {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
             }
-        }
-        mBaseFlContent.addView(mDataEmptyView);
-    }
-
-    /**
-     * 移除数据为空View
-     */
-    public void removeEmptyDataView() {
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
+            mBaseFlContent.addView(mDataEmptyView);
+        } else {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
             }
         }
     }
 
-
     /**
-     * 显示网络异常View
+     * 设置是否显示网络异常界面
      */
-    public void showNetExceptionView() {
+    @Override
+    public void setNetExceptionViewVisiable(boolean visiable) {
         if (mNetExceptionView == null)
             return;
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
+        if (visiable) {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
+            }
+            mBaseFlContent.addView(mNetExceptionView);
+        } else {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
             }
         }
-        mBaseFlContent.addView(mNetExceptionView);
     }
 
-    /**
-     * 移除数据为空View
-     */
-    public void removeNetExceptionView() {
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
-            }
-        }
-    }
 
     /**
      * 创建loading
      */
-    public void createLoading() {
+    @Override
+    public void creatLoading() {
 
     }
 
     /**
-     * 关闭loading
+     * 隐藏loading
      */
+    @Override
     public void dimissLoading() {
 
     }

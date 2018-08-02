@@ -9,7 +9,7 @@ import android.view.WindowManager.LayoutParams;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.seven.framework.R;
-import com.seven.framework.base.SelectDialogBean;
+import com.seven.framework.entity.SelectDialogBean;
 import com.seven.framework.utils.DeviceInfo;
 import com.seven.framework.view.adapter.SelectAdapter;
 import com.seven.framework.widget.VDividerItemDecoration;

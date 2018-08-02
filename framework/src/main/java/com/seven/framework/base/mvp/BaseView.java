@@ -10,11 +10,7 @@ public interface BaseView {
 
     void dimissLoading();
 
-    void showEmptyDataView();
+    void setEmptyDataViewVisiable(boolean visiable);
 
-    void removeEmptyDataView();
-
-    void showNetExceptionView();
-
-    void removeNetExceptionView();
+    void setNetExceptionViewVisiable(boolean visiable);
 }

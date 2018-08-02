@@ -36,11 +36,9 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         onCreatPresenter();
         if (mPresenter != null)
             mPresenter.attachView((V) this);
-    }
-
-    private void findBaseView() {
-        mBaseAbl = findViewById(R.id.base_abl);
-        mBaseFlContent = findViewById(R.id.base_fl_content);
+        initData();
+        initView();
+        initServiceData();
     }
 
     /**
@@ -53,9 +51,16 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     public void setContentView(int layoutResID) {
         super.setContentView(R.layout.activity_base);
         findBaseView();
-        addTitleView(R.layout.include_title);
-        findTitleView();
+        setTitleView(R.layout.include_title);
         addContentView(layoutResID);
+    }
+
+    /**
+     * base根View
+     */
+    private void findBaseView() {
+        mBaseAbl = findViewById(R.id.base_abl);
+        mBaseFlContent = findViewById(R.id.base_fl_content);
     }
 
     /**
@@ -63,10 +68,13 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      *
      * @param layoutResID layoutid
      */
-    public void addTitleView(int layoutResID) {
+    public void setTitleView(int layoutResID) {
         if (mBaseAbl.getChildCount() > 0)
             mBaseAbl.removeAllViews();
         mBaseAbl.addView(LayoutInflater.from(getApplicationContext()).inflate(layoutResID, mBaseAbl, false));
+        if (R.layout.include_title == layoutResID) {
+            findTitleView();
+        }
     }
 
     /**
@@ -74,10 +82,15 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      *
      * @param view view
      */
-    public void addTitleView(View view) {
+    public void setTitleView(View view) {
         if (mBaseAbl.getChildCount() > 0)
             mBaseAbl.removeAllViews();
         mBaseAbl.addView(view);
+        if (mTitleView != null) {
+            mTitleView.titleLeftIvLeft = null;
+            mTitleView.titleCenterTv = null;
+        }
+        mTitleView = null;
     }
 
     /**
@@ -86,7 +99,22 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     public void findTitleView() {
         mTitleView = new TitleView();
         mTitleView.titleLeftIvLeft = findViewById(R.id.title_left_iv_left);
+        mTitleView.titleLeftIvLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        mTitleView.titleLeftTv = findViewById(R.id.title_left_tv);
+        mTitleView.titleLeftIvRight = findViewById(R.id.title_left_iv_right);
+
+        mTitleView.titleCenterIvLeft = findViewById(R.id.title_center_iv_left);
         mTitleView.titleCenterTv = findViewById(R.id.title_center_tv);
+        mTitleView.titleCenterIvRight = findViewById(R.id.title_center_iv_right);
+
+        mTitleView.titleRightIvLeft = findViewById(R.id.title_right_iv_left);
+        mTitleView.titleRightTv = findViewById(R.id.title_right_tv);
+        mTitleView.titleRightIvRight = findViewById(R.id.title_right_iv_right);
     }
 
     /**
@@ -95,12 +123,8 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      * @param title
      */
     public void setTitle(String title) {
-        if (mTitleView != null && mTitleView.titleCenterTv != null) {
+        if (mTitleView != null && mTitleView.titleCenterTv != null)
             mTitleView.titleCenterTv.setText(title);
-        } else {
-            findTitleView();
-            mTitleView.titleCenterTv.setText(title);
-        }
     }
 
     /**
@@ -109,27 +133,17 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      * @param resourceId
      */
     public void setTitle(int resourceId) {
-        if (mTitleView != null && mTitleView.titleCenterTv != null) {
+        if (mTitleView != null && mTitleView.titleCenterTv != null)
             mTitleView.titleCenterTv.setText(resourceId);
-        } else {
-            findTitleView();
-            mTitleView.titleCenterTv.setText(resourceId);
-        }
-    }
-
-
-    /**
-     * 隐藏title
-     */
-    public void hideTitleView() {
-        mBaseAbl.setVisibility(View.GONE);
     }
 
     /**
-     * 显示title
+     * 设置title是否可见
+     *
+     * @param visibility
      */
-    public void showTitleView() {
-        mBaseAbl.setVisibility(View.VISIBLE);
+    public void setTitleViewVisiable(int visibility) {
+        mBaseAbl.setVisibility(visibility);
     }
 
     /**
@@ -163,58 +177,52 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         mNetExceptionView = netExceptionView;
     }
 
-
     /**
-     * 显示数据为空View
+     * 设置是否显示空界面
      */
-    public void showEmptyDataView() {
+    @Override
+    public void setEmptyDataViewVisiable(boolean visiable) {
         if (mDataEmptyView == null)
             return;
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
+        if (visiable) {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
             }
-        }
-        mBaseFlContent.addView(mDataEmptyView);
-    }
-
-    /**
-     * 移除数据为空View
-     */
-    public void removeEmptyDataView() {
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
+            mBaseFlContent.addView(mDataEmptyView);
+        } else {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
             }
         }
     }
 
-
     /**
-     * 显示网络异常View
+     * 设置是否显示网络异常界面
      */
-    public void showNetExceptionView() {
+    @Override
+    public void setNetExceptionViewVisiable(boolean visiable) {
         if (mNetExceptionView == null)
             return;
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
+        if (visiable) {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
+            }
+            mBaseFlContent.addView(mNetExceptionView);
+        } else {
+            if (mBaseFlContent.getChildCount() > 1) {
+                for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
+                    mBaseFlContent.removeViewAt(i);
+                }
             }
         }
-        mBaseFlContent.addView(mNetExceptionView);
-    }
 
-    /**
-     * 移除数据为空View
-     */
-    public void removeNetExceptionView() {
-        if (mBaseFlContent.getChildCount() > 1) {
-            for (int i = 1; i < mBaseFlContent.getChildCount(); i++) {
-                mBaseFlContent.removeViewAt(i);
-            }
-        }
     }
-
 
     /**
      * 用于初始化本地数据
@@ -230,9 +238,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     /**
      * 用于初始化网络数据
      */
-    public void initServiceData() {
-
-    }
+    public abstract void initServiceData();
 
     /**
      * 创建loading
@@ -270,9 +276,9 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      * @param cls      跳转activity class name
      * @param isFinish 是否关闭当前activity
      */
-    public void goActivity(Class<?> cls, Boolean isFinish, boolean new_task) {
+    public void goActivity(Class<?> cls, Boolean isFinish, boolean newTask) {
         Intent intent = new Intent(this, cls);
-        if (new_task) {
+        if (newTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         startActivity(intent);
@@ -338,11 +344,11 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      * @param bundle      携带数据
      * @param isFinish    是否关闭当前activity
      * @param requestCode 请求码
-     * @param new_task    是否开启新的栈
+     * @param newTask     是否开启新的栈
      */
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish, int requestCode, boolean new_task) {
+    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish, int requestCode, boolean newTask) {
         Intent intent = new Intent(this, cls);
-        if (new_task) {
+        if (newTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         intent.putExtra(BUNDLE, bundle);
@@ -372,7 +378,15 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
 
     public static final class TitleView {
         public ImageView titleLeftIvLeft;
-        public TextView titleCenterTv;
+        public TextView titleLeftTv;
+        public ImageView titleLeftIvRight;
 
+        public ImageView titleCenterIvLeft;
+        public TextView titleCenterTv;
+        public ImageView titleCenterIvRight;
+
+        public ImageView titleRightIvLeft;
+        public TextView titleRightTv;
+        public ImageView titleRightIvRight;
     }
 }
