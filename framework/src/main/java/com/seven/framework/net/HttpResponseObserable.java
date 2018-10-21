@@ -8,21 +8,38 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
 public abstract class HttpResponseObserable<T> implements Observer<BaseHttpResponseBean<T>> {
-
-
     private BasePresenter mBasePresenter;
     private Disposable mDisposable;
+    private boolean mAutoShowLoading;
 
     public HttpResponseObserable() {
     }
 
+    /**
+     * 用于解绑
+     *
+     * @param basePresenter
+     */
     public HttpResponseObserable(BasePresenter basePresenter) {
         mBasePresenter = basePresenter;
+    }
+
+    /**
+     * 用于解绑 显示或隐藏loading
+     *
+     * @param basePresenter
+     * @param autoShowLoading 是否自动显示loading
+     */
+    public HttpResponseObserable(BasePresenter basePresenter, boolean autoShowLoading) {
+        mBasePresenter = basePresenter;
+        this.mAutoShowLoading = autoShowLoading;
     }
 
     @Override
     public void onSubscribe(Disposable d) {
         mDisposable = d;
+        if (mBasePresenter != null && mAutoShowLoading && mBasePresenter.isAttachView())
+            mBasePresenter.getView().creatLoading();
     }
 
     @Override
@@ -36,7 +53,10 @@ public abstract class HttpResponseObserable<T> implements Observer<BaseHttpRespo
                 }
             } else if (mDisposable != null && !mDisposable.isDisposed()) {
                 mDisposable.dispose();
+                mDisposable = null;
             }
+            if (mAutoShowLoading)
+                mBasePresenter.getView().dimissLoading();
         } else {
             if (baseHttpResponseBean.result == BaseHttpResponseBean.SUCCESS) {
                 onSuccess(baseHttpResponseBean.data);
@@ -51,8 +71,11 @@ public abstract class HttpResponseObserable<T> implements Observer<BaseHttpRespo
         if (mBasePresenter != null) {
             if (mBasePresenter.isAttachView()) {
                 onFail(e);
+                if (mAutoShowLoading)
+                    mBasePresenter.getView().dimissLoading();
             } else if (mDisposable != null && !mDisposable.isDisposed()) {
                 mDisposable.dispose();
+                mDisposable = null;
             }
         } else {
             onFail(e);

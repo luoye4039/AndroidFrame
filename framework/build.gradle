@@ -27,17 +27,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        interTest.with { debug }
         interTest {
             buildConfigField 'String', 'SERVICE_API', Test_Evnvironment
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-fresco.pro'
             matchingFallbacks = ['debug', 'release']
-            debuggable true
-            jniDebuggable false
-            renderscriptDebuggable false
-            renderscriptOptimLevel 3
-            zipAlignEnabled false
-            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

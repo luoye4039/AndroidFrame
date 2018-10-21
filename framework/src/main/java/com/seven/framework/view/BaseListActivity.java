@@ -53,7 +53,7 @@ public abstract class BaseListActivity<D> extends BaseActivity<BaseListView, Bas
 
     @Override
     public void initServiceData() {
-        super.initServiceData();
+
     }
 
     public abstract BaseQuickAdapter getAdapter();

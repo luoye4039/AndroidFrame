@@ -36,9 +36,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         onCreatPresenter();
         if (mPresenter != null)
             mPresenter.attachView((V) this);
-        initData();
-        initView();
-        initServiceData();
     }
 
     /**

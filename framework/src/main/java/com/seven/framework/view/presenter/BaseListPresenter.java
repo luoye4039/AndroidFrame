@@ -30,7 +30,7 @@ public abstract class BaseListPresenter<D> extends BasePresenter<BaseListView> {
                         if (list != null && list.size() > 0) {
                             getView().onSetDatas(list);
                         } else {
-                            getView().showEmptyDataView();
+                            getView().setEmptyDataViewVisiable(true);
                         }
                         getView().stopRefresh();
 

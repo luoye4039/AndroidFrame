@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.iol8.framework.app.RootConfig;
+import com.seven.framework.base.BaseConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ public class RxPermissionsFragment extends Fragment {
             log("onRequestPermissionsResult  " + permissions[i]);
 
             if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equalsIgnoreCase(permissions[i]) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                RootConfig.initAPPFilePath(getActivity() != null ? getActivity().getApplicationContext() : null);
+                BaseConfig.initAPPFilePath();
             }
 
             // Find the corresponding subject
