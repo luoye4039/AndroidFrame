@@ -3,11 +3,14 @@ package com.seven.framework.base;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
+import com.seven.framework.inter.OnBackPressedListener;
 import com.seven.framework.manager.AppManager;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public abstract class FrameworkActivity extends AppCompatActivity {
     public static String BUNDLE = "bundle";
@@ -152,5 +155,17 @@ public abstract class FrameworkActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         AppManager.getInstance().removeActivity(mActivityWeakReference);
+    }
+
+    @Override
+    public void onBackPressed() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        if (fragments != null && fragments.size() > 0) {
+            for (Fragment fragment : fragments) {
+                if (fragment instanceof OnBackPressedListener)
+                    ((OnBackPressedListener) fragment).onBackPressed();
+            }
+        }
+        super.onBackPressed();
     }
 }

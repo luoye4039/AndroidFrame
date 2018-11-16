@@ -35,7 +35,7 @@ public class CommonSelectDialog extends Dialog {
         this(context, R.style.TransparentBgDialog);
     }
 
-    private CommonSelectDialog(Context context, int theme) {
+    public CommonSelectDialog(Context context, int theme) {
         super(context, theme);
         initDialog(context);
     }

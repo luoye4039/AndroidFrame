@@ -1,16 +1,18 @@
 package com.seven.framework.base;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+
+import com.seven.framework.inter.OnBackPressedListener;
 
 
 /**
  * Created by wangbin on 2016/8/15.
  */
-public abstract class FrameworkFragment extends Fragment {
+public abstract class FrameworkFragment extends Fragment implements OnBackPressedListener {
     public Activity mActivity;
     public static String BUNDLE = "bundle";
 
@@ -136,5 +138,10 @@ public abstract class FrameworkFragment extends Fragment {
         if (isFinish) {
             mActivity.finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

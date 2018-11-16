@@ -52,23 +52,24 @@ public class CommonDialog extends Dialog implements View.OnClickListener {
     // 动画效果，出现和消失 位移动画
     // 布局，全屏宽度、包裹内容高度、顶部对齐
     // 背景：灰的，点击背景对话框消失
-    private CommonDialog(Context context, boolean cancelable,
-                         OnCancelListener cancelListener) {
+    public CommonDialog(Context context, boolean cancelable,
+                        OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
+        initDialog(context);
     }
 
     private void initDialog(Context context) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_common, null);
         setContentView(dialogView);
-        mCommonIvContentTop =  findViewById(R.id.common_iv_content_top);
+        mCommonIvContentTop = findViewById(R.id.common_iv_content_top);
         mCommonLl = findViewById(R.id.common_ll);
-        mCommonTvTitle =  findViewById(R.id.common_tv_title);
-        mCommonTvContent =  findViewById(R.id.common_tv_content);
-        mCommonTvContent2 =  findViewById(R.id.common_tv_content2);
+        mCommonTvTitle = findViewById(R.id.common_tv_title);
+        mCommonTvContent = findViewById(R.id.common_tv_content);
+        mCommonTvContent2 = findViewById(R.id.common_tv_content2);
         mCommonRlAdd = findViewById(R.id.common_rl_add);
-        mCommonTvDialogLeft =  findViewById(R.id.common_tv_dialog_left);
+        mCommonTvDialogLeft = findViewById(R.id.common_tv_dialog_left);
         mCommonTvDialogLeft.setOnClickListener(this);
-        mCommonViewDialogLine =  findViewById(R.id.common_view_dialog_line);
+        mCommonViewDialogLine = findViewById(R.id.common_view_dialog_line);
         mCommonTvDialogRight = findViewById(R.id.common_tv_dialog_right);
         mCommonTvDialogRight.setOnClickListener(this);
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
