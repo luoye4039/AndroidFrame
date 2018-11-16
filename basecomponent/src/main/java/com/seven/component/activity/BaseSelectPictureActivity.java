@@ -12,7 +12,7 @@ import android.view.View;
 
 import com.seven.component.R;
 import com.seven.component.dialog.CommonSelectDialog;
-import com.seven.framework.base.BaseActivity;
+import com.seven.framework.base.FrameworkActivity;
 import com.seven.framework.base.BaseConfig;
 import com.seven.framework.base.mvp.BasePresenter;
 import com.seven.framework.base.mvp.BaseView;

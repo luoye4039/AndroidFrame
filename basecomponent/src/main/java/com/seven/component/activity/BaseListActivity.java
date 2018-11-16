@@ -11,7 +11,6 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
 import com.seven.component.R;
 import com.seven.component.activity.presenter.BaseListPresenter;
 import com.seven.component.activity.presenter.BaseListView;
-import com.seven.framework.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;

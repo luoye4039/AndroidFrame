@@ -14,7 +14,6 @@ import android.view.View;
 import com.seven.component.R;
 import com.seven.component.dialog.CommonSelectDialog;
 import com.seven.framework.base.BaseConfig;
-import com.seven.framework.base.BaseFragment;
 import com.seven.framework.base.mvp.BasePresenter;
 import com.seven.framework.base.mvp.BaseView;
 import com.seven.framework.entity.SelectDialogBean;
@@ -164,7 +163,7 @@ public abstract class BaseSelectPictureFragment<V extends BaseView, P extends Ba
         }
 
         //信息来自剪切图片
-        if (requestCode == MY_CROP_PICTURE_REQUEST && resultCode ==Activity. RESULT_OK) {
+        if (requestCode == MY_CROP_PICTURE_REQUEST && resultCode == Activity.RESULT_OK) {
             Uri fileUri = data.getData();
             final File file;
             if (fileUri == null) {

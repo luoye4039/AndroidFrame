@@ -1,9 +1,5 @@
-package com.seven.framework.base;
+package com.seven.component.activity;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.seven.framework.R;
+import com.seven.component.R;
+import com.seven.framework.base.BaseApplication;
+import com.seven.framework.base.FrameworkFragment;
 import com.seven.framework.base.mvp.BasePresenter;
 import com.seven.framework.base.mvp.BaseView;
 
@@ -21,11 +19,9 @@ import com.seven.framework.base.mvp.BaseView;
 /**
  * Created by wangbin on 2016/8/15.
  */
-public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V>> extends Fragment implements BaseView {
-    public Activity mActivity;
+public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V>> extends FrameworkFragment implements BaseView {
     private boolean isViewCreated;
     private boolean isLoadData;
-    public static String BUNDLE = "bundle";
     public View mBaseFragmentView;//fragment 基础View
     private AppBarLayout mBaseAbl;//Fragment 公共头
     private FrameLayout mBaseFlContent;//实现显示View
@@ -37,17 +33,12 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
 
     /**
      * 当前是否使用软加载
-     *默认为开启状态，关闭复写此方法
+     * 默认为开启状态，关闭复写此方法
+     *
      * @return
      */
     protected boolean isUserLazyLoad() {
         return true;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mActivity = getActivity();
     }
 
     @Nullable
@@ -145,24 +136,6 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
         mNetExceptionView = netExceptionView;
     }
 
-
-    /**
-     * 用于初始化各种数据
-     */
-    public abstract void initData();
-
-    /**
-     * 用于findViewById
-     */
-    public abstract void initView();
-
-
-    /**
-     * 用于根据获得数据初始化view
-     */
-    public abstract void initServiceData();
-
-
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -249,107 +222,5 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
         isViewCreated = false;
         if (mPresenter != null)
             mPresenter.detachView();
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls      跳转activity class name
-     * @param isFinish 是否关闭当前activity
-     */
-    public void goActivity(Class<?> cls, Boolean isFinish) {
-        Intent intent = new Intent(mActivity, cls);
-        startActivity(intent);
-        if (isFinish) {
-            mActivity.finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls      跳转activity class name
-     * @param isFinish 是否关闭当前activity
-     */
-    public void goActivity(Class<?> cls, Boolean isFinish, boolean new_task) {
-        Intent intent = new Intent(mActivity, cls);
-        if (new_task) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-        startActivity(intent);
-        if (isFinish) {
-            mActivity.finish();
-        }
-    }
-
-
-    /**
-     * 跳转activity
-     *
-     * @param cls      跳转activity class name
-     * @param bundle   携带数据
-     * @param isFinish 是否关闭当前activity
-     */
-
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish) {
-        Intent intent = new Intent(mActivity, cls);
-        intent.putExtra(BUNDLE, bundle);
-        startActivity(intent);
-        if (isFinish) {
-            mActivity.finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls         跳转activity class name
-     * @param isFinish    是否关闭当前activity
-     * @param requestCode 请求码
-     */
-    public void goActivity(Class<?> cls, Boolean isFinish, int requestCode) {
-        Intent intent = new Intent(mActivity, cls);
-        startActivityForResult(intent, requestCode);
-        if (isFinish) {
-            mActivity.finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls         跳转activity class name
-     * @param bundle      携带数据
-     * @param isFinish    是否关闭当前activity
-     * @param requestCode 请求码
-     */
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish, int requestCode) {
-        Intent intent = new Intent(mActivity, cls);
-        intent.putExtra(BUNDLE, bundle);
-        startActivityForResult(intent, requestCode);
-        if (isFinish) {
-            mActivity.finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls         跳转activity class name
-     * @param bundle      携带数据
-     * @param isFinish    是否关闭当前activity
-     * @param requestCode 请求码
-     * @param new_task    是否开启新的栈
-     */
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish, int requestCode, boolean new_task) {
-        Intent intent = new Intent(mActivity, cls);
-        if (new_task) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-        intent.putExtra(BUNDLE, bundle);
-        startActivityForResult(intent, requestCode);
-        if (isFinish) {
-            mActivity.finish();
-        }
     }
 }

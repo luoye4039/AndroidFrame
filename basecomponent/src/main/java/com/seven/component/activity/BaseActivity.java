@@ -1,26 +1,19 @@
-package com.seven.framework.base;
+package com.seven.component.activity;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.seven.framework.R;
+import com.seven.component.R;
+import com.seven.framework.base.FrameworkActivity;
 import com.seven.framework.base.mvp.BasePresenter;
 import com.seven.framework.base.mvp.BaseView;
-import com.seven.framework.manager.AppManager;
 
-import java.lang.ref.WeakReference;
-
-public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V>> extends AppCompatActivity implements BaseView {
-    public static String BUNDLE = "bundle";
-    private WeakReference<Activity> mActivityWeakReference;
+public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V>> extends FrameworkActivity implements BaseView {
     public P mPresenter;
     private FrameLayout mBaseFlContent;
     private AppBarLayout mBaseAbl;
@@ -31,8 +24,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivityWeakReference = new WeakReference<Activity>(this);
-        AppManager.getInstance().addActivity(mActivityWeakReference);
         onCreatPresenter();
         if (mPresenter != null)
             mPresenter.attachView((V) this);
@@ -228,21 +219,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         }
     }
 
-    /**
-     * 用于初始化本地数据
-     */
-    public abstract void initData();
-
-    /**
-     * 用于findViewById
-     */
-    public abstract void initView();
-
-
-    /**
-     * 用于初始化网络数据
-     */
-    public abstract void initServiceData();
 
     /**
      * 创建loading
@@ -260,125 +236,12 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
 
     }
 
-    /**
-     * 跳转activity
-     *
-     * @param cls      跳转activity class name
-     * @param isFinish 是否关闭当前activity
-     */
-    public void goActivity(Class<?> cls, Boolean isFinish) {
-        Intent intent = new Intent(this, cls);
-        startActivity(intent);
-        if (isFinish) {
-            finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls      跳转activity class name
-     * @param isFinish 是否关闭当前activity
-     */
-    public void goActivity(Class<?> cls, Boolean isFinish, boolean newTask) {
-        Intent intent = new Intent(this, cls);
-        if (newTask) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-        startActivity(intent);
-        if (isFinish) {
-            finish();
-        }
-    }
-
-
-    /**
-     * 跳转activity
-     *
-     * @param cls      跳转activity class name
-     * @param bundle   携带数据
-     * @param isFinish 是否关闭当前activity
-     */
-
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish) {
-        Intent intent = new Intent(this, cls);
-        intent.putExtra(BUNDLE, bundle);
-        startActivity(intent);
-        if (isFinish) {
-            finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls         跳转activity class name
-     * @param isFinish    是否关闭当前activity
-     * @param requestCode 请求码
-     */
-    public void goActivity(Class<?> cls, Boolean isFinish, int requestCode) {
-        Intent intent = new Intent(this, cls);
-        startActivityForResult(intent, requestCode);
-        if (isFinish) {
-            finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls         跳转activity class name
-     * @param bundle      携带数据
-     * @param isFinish    是否关闭当前activity
-     * @param requestCode 请求码
-     */
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish, int requestCode) {
-        Intent intent = new Intent(this, cls);
-        intent.putExtra(BUNDLE, bundle);
-        startActivityForResult(intent, requestCode);
-        if (isFinish) {
-            finish();
-        }
-    }
-
-    /**
-     * 跳转activity
-     *
-     * @param cls         跳转activity class name
-     * @param bundle      携带数据
-     * @param isFinish    是否关闭当前activity
-     * @param requestCode 请求码
-     * @param newTask     是否开启新的栈
-     */
-    public void goActivity(Class<?> cls, Bundle bundle, Boolean isFinish, int requestCode, boolean newTask) {
-        Intent intent = new Intent(this, cls);
-        if (newTask) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-        intent.putExtra(BUNDLE, bundle);
-        startActivityForResult(intent, requestCode);
-        if (isFinish) {
-            finish();
-        }
-    }
-
-    /**
-     * 返回跳转携带的数据Bundle
-     *
-     * @return
-     */
-    public Bundle getExtraBundle() {
-        return getIntent().getBundleExtra(BUNDLE);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AppManager.getInstance().removeActivity(mActivityWeakReference);
         if (mPresenter != null)
             mPresenter.detachView();
     }
-
 
     public static final class TitleView {
         public ImageView titleLeftIvLeft;
