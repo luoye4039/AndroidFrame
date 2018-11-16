@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
+    compileSdkVersion COMPILE_SDK_VERSION as int
     defaultConfig {
         applicationId "com.seven.frame.frame"
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
+        versionCode VERSION_CODE as int
+        versionName VERSION_NAME
     }
     buildTypes {
         release {

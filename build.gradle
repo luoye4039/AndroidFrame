@@ -33,19 +33,13 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 ext {
-
-    // SDK And Tools
-    minSdkVersion = 17
-    targetSdkVersion = 27
-    compileSdkVersion = 27
-
     //Dependencies
     supportLibraryVersion = "27.1.1"
     var = [
             SupportV7            : "com.android.support:appcompat-v7:$supportLibraryVersion",
             SupportV4            : "com.android.support:support-v4:$supportLibraryVersion",
             SupportDesign        : "com.android.support:design:$supportLibraryVersion",
-            SupportRecyclerviewV7: "com.android.support:recyclerview-v7:$supportLibraryVersion"
+            SupportRecyclerviewV7: "com.android.support:recyclerview-v7:$supportLibraryVersion",
+            ConstraintLayout: "com.android.support.constraint:constraint-layout:1.1.3"
     ]
-
 }
