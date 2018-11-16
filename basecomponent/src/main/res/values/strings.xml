@@ -1,0 +1,8 @@
+<resources>
+    <string name="ablum">相册</string>
+    <string name="camera">拍照</string>
+    <string name="cancle">取消</string>
+    <string name="save_to_phone">保存到手机</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_fail">保存失败</string>
+</resources>

@@ -3,8 +3,8 @@ package com.seven.frame.frame;
 import android.os.Bundle;
 import android.view.View;
 
+import com.seven.component.dialog.CommonDialogFragment;
 import com.seven.framework.base.BaseActivity;
-import com.seven.framework.view.dialog.CommonDialogFragment;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 

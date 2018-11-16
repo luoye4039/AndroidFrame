@@ -1,32 +1,33 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION as int
     defaultConfig {
-        applicationId "com.seven.frame.frame"
         minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion TARGET_SDK_VERSION as int
-        versionCode VERSION_CODE as int
-        versionName VERSION_NAME
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
     }
+
     buildTypes {
         release {
             buildConfigField 'String', 'SERVICE_API', Release_Evnvironment
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        releaseTest.with {release}
+        releaseTest.with { release }
         releaseTest {
-            debuggable  true
+            debuggable true
             matchingFallbacks = ['debug', 'release']
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug{
+        debug {
             buildConfigField 'String', 'SERVICE_API', Develop_Evnvironment
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        interTest.with {debug}
+        interTest.with { debug }
         interTest {
             buildConfigField 'String', 'SERVICE_API', Test_Evnvironment
             minifyEnabled false
@@ -34,9 +35,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':basecomponent')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api project(':framework')
 }
