@@ -26,8 +26,6 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
     private boolean isViewCreated;
     private boolean isLoadData;
     public static String BUNDLE = "bundle";
-    private static final String USER_LAZY_LOAD = "user_lazy_load";
-    private boolean userLazyLoad;
     public View mBaseFragmentView;//fragment 基础View
     private AppBarLayout mBaseAbl;//Fragment 公共头
     private FrameLayout mBaseFlContent;//实现显示View
@@ -39,43 +37,22 @@ public abstract class BaseFragment<V extends BaseView, P extends BasePresenter<V
 
     /**
      * 当前是否使用软加载
-     *
+     *默认为开启状态，关闭复写此方法
      * @return
      */
-    public boolean isUserLazyLoad() {
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            this.userLazyLoad = arguments.getBoolean(USER_LAZY_LOAD);
-        }
-        return userLazyLoad;
-    }
-
-    /**
-     * 设置是否使用软加载  在onCreateView 内使用
-     *
-     * @param userLazyLoad
-     */
-    public void setUserLazyLoad(boolean userLazyLoad) {
-        Bundle arguments = getArguments();
-        if (arguments == null) {
-            arguments = new Bundle();
-            arguments.putBoolean(USER_LAZY_LOAD, userLazyLoad);
-        } else {
-            arguments.putBoolean(USER_LAZY_LOAD, userLazyLoad);
-        }
-        this.userLazyLoad = userLazyLoad;
-        setArguments(arguments);
+    protected boolean isUserLazyLoad() {
+        return true;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mActivity = getActivity();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mActivity = getActivity();
         mBaseFragmentView = inflater.inflate(R.layout.fragment_base, container, false);
         mBaseAbl = mBaseFragmentView.findViewById(R.id.base_abl);
         mBaseFlContent = mBaseFragmentView.findViewById(R.id.base_fl_content);

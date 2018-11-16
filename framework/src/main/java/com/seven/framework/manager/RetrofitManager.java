@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.seven.framework.BuildConfig;
 import com.seven.framework.manager.uploadordown.DownFileBean;
 import com.seven.framework.manager.uploadordown.OnDownFileObserver;
-import com.seven.framework.manager.uploadordown.OnUploadFileObserver;
 import com.seven.framework.net.FrameServiceApi;
 import com.seven.framework.utils.FileUtil;
 
@@ -13,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,9 +35,13 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Retrofit 网络请求工具
+ */
 public class RetrofitManager {
-    private static String sBaseUrl;
-    private Retrofit mDefaultRetrofit;
+
+    private Map<String, Retrofit> mRetrofitMap = new HashMap<>();
+    private String mBaseUrl;
 
     private RetrofitManager() {
         initConfig();
@@ -56,9 +60,9 @@ public class RetrofitManager {
      */
     private void initConfig() {
         if (BuildConfig.DEBUG) {
-            sBaseUrl = "";
+            mBaseUrl = "";
         } else {
-            sBaseUrl = "";
+            mBaseUrl = "";
         }
         initDefaultRetrofit();
     }
@@ -71,70 +75,81 @@ public class RetrofitManager {
         if (BuildConfig.DEBUG) {
             interceptors.add(new HttpLoggingInterceptor());
         }
-        mDefaultRetrofit = new Retrofit.Builder()
-                .baseUrl(sBaseUrl)
+        mRetrofitMap.put(mBaseUrl, new Retrofit.Builder()
+                .baseUrl(mBaseUrl)
                 .client(OkHttpManager.getInstance().getOkHttpClient(interceptors))
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+                .build());
+    }
+
+    /**
+     * 获得配置默认的的ServiceApi
+     *
+     * @param serviceClass  serviceApi
+     * @param <T>   制定类型的ServiceApi
+     * @return  serviceApi
+     */
+    public <T> T getDefaultServiceApi(Class<T> serviceClass) {
+        if (!mRetrofitMap.containsKey(mBaseUrl)) {
+            initConfig();
+        }
+        return mRetrofitMap.get(mBaseUrl).create(serviceClass);
+    }
+
+
+    /**
+     * 获得指定的ServiceApi
+     *
+     * @param baseUrl  基础url
+     * @param serviceClass  serviceApi
+     * @param <T>   制定类型的ServiceApi
+     * @return  serviceApi
+     */
+    public <T> T geUrlServiceApi(String baseUrl, Class<T> serviceClass) {
+        if (!mRetrofitMap.containsKey(baseUrl)) {
+            List<Interceptor> interceptors = new ArrayList<>();
+            if (BuildConfig.DEBUG) {
+                interceptors.add(new HttpLoggingInterceptor());
+            }
+            mRetrofitMap.put(baseUrl, new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .client(OkHttpManager.getInstance().getOkHttpClient(interceptors))
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build());
+        }
+        return mRetrofitMap.get(baseUrl).create(serviceClass);
     }
 
     /**
      * 获得指定的ServiceApi
      *
-     * @param serviceClass
-     * @param <T>
-     * @return
+     * @param baseUrl  基础url
+     * @param serviceClass  serviceApi
+     * @param okHttpClient  指定HttpClient
+     * @param <T>   制定类型的ServiceApi
+     * @return  serviceApi
      */
-    public <T> T getDefaultServiceApi(Class<T> serviceClass) {
-        if (mDefaultRetrofit == null) {
-            initConfig();
+    public <T> T geUrlServiceApi(String baseUrl, Class<T> serviceClass,OkHttpClient okHttpClient) {
+        if (!mRetrofitMap.containsKey(baseUrl)) {
+            mRetrofitMap.put(baseUrl, new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .client(okHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build());
         }
-        return mDefaultRetrofit.create(serviceClass);
-    }
-
-    /**
-     * 创建指定URL的Retrofit
-     *
-     * @param baseUrl
-     * @return
-     */
-    public Retrofit creatRetrofit(String baseUrl) {
-        List<Interceptor> interceptors = new ArrayList<>();
-        if (BuildConfig.DEBUG) {
-            interceptors.add(new HttpLoggingInterceptor());
-        }
-        return new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .client(OkHttpManager.getInstance().getOkHttpClient(interceptors))
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
-    }
-
-    /**
-     * 创建指定URL的Retrofit
-     *
-     * @param baseUrl
-     * @param okHttpClient
-     * @return
-     */
-    public Retrofit creatRetrofit(String baseUrl, OkHttpClient okHttpClient) {
-        return new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+        return mRetrofitMap.get(baseUrl).create(serviceClass);
     }
 
 
     /**
      * 上传文件
      *
-     * @param urlPath
-     * @param parmas
-     * @param filePaths
+     * @param urlPath  文件上传服务器地址
+     * @param parmas  文件上传参数
+     * @param filePaths  文件本地地址
      * @return
      */
     public Observable<Response> uploadFiles(@NonNull String urlPath, Map<String, String> parmas, @NonNull List<String> filePaths) {
@@ -151,14 +166,12 @@ public class RetrofitManager {
     }
 
 
-
-
     /**
      * 下载文件
      *
-     * @param url
-     * @param filePath
-     * @param onDownFileObserver
+     * @param url 下载文件的URL
+     * @param filePath  文件下载到本地的地址
+     * @param onDownFileObserver  文件下载回调
      * @return
      */
     public void downFile(@NonNull final String url, @NonNull final String filePath, OnDownFileObserver onDownFileObserver) {

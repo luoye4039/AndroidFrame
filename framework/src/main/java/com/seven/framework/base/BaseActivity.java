@@ -24,7 +24,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     public P mPresenter;
     private FrameLayout mBaseFlContent;
     private AppBarLayout mBaseAbl;
-    private TitleView mTitleView;
+    protected TitleView mTitleView;
     private View mDataEmptyView;//当数据为空显示View
     private View mNetExceptionView;//当网络异常显示View
 
@@ -60,6 +60,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         mBaseFlContent = findViewById(R.id.base_fl_content);
     }
 
+
     /**
      * 添加通用title
      *
@@ -85,7 +86,14 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         mBaseAbl.addView(view);
         if (mTitleView != null) {
             mTitleView.titleLeftIvLeft = null;
+            mTitleView.titleLeftTv = null;
+            mTitleView.titleLeftIvRight = null;
+            mTitleView.titleCenterIvLeft = null;
             mTitleView.titleCenterTv = null;
+            mTitleView.titleCenterIvRight = null;
+            mTitleView.titleRightIvLeft = null;
+            mTitleView.titleRightTv = null;
+            mTitleView.titleRightIvRight = null;
         }
         mTitleView = null;
     }
@@ -93,13 +101,13 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     /**
      * 获取默认Title的View
      */
-    public void findTitleView() {
+    private void findTitleView() {
         mTitleView = new TitleView();
         mTitleView.titleLeftIvLeft = findViewById(R.id.title_left_iv_left);
         mTitleView.titleLeftIvLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
         mTitleView.titleLeftTv = findViewById(R.id.title_left_tv);
@@ -218,7 +226,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
                 }
             }
         }
-
     }
 
     /**

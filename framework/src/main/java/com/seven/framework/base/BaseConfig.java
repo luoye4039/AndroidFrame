@@ -6,8 +6,10 @@ import com.seven.framework.utils.FileUtil;
 
 import java.io.File;
 
+import io.reactivex.Observable;
+
 public class BaseConfig {
-    public boolean mIsInitConfig;
+    public boolean mIsInitConfig;//避免多次初始化
 
     public void initApp() {
         if (!mIsInitConfig) {
