@@ -1,18 +1,21 @@
 package com.seven.framework.base;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 import android.support.multidex.MultiDex;
 
 import com.seven.framework.manager.AppManager;
 import com.seven.framework.utils.ToastUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.Locale;
 
 /**
  * Base Application
  */
 
-public class BaseApplication extends Application {
+public class BaseApplication extends Application implements Application.ActivityLifecycleCallbacks {
     public static AppManager sAppManager;
     public static Locale sAppLanguage = Locale.SIMPLIFIED_CHINESE;//app语言
     public static BaseApplication sBaseApplication;
@@ -23,6 +26,8 @@ public class BaseApplication extends Application {
         MultiDex.install(this);
         sAppManager = AppManager.getInstance();
         sBaseApplication = this;
+        //注册所有activity生命周期监听
+        registerActivityLifecycleCallbacks(this);
     }
 
     /**
@@ -34,6 +39,41 @@ public class BaseApplication extends Application {
         if (isOpenUncaughtException) {
             Thread.currentThread().setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
         }
+    }
+
+    @Override
+    public void onActivityCreated(Activity activity, Bundle bundle) {
+        AppManager.getInstance().addActivity(new WeakReference<Activity>(activity));
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+        AppManager.getInstance().removeActivity(activity);
     }
 
     public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {

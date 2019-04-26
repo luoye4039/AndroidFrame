@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
+
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -75,6 +76,28 @@ public class AppManager {
     public void removeActivity(WeakReference<Activity> activity) {
         if (mActivityStack != null) {
             mActivityStack.remove(activity);
+        }
+    }
+
+    /**
+     * 删除ac
+     *
+     * @param activity 弱引用的ac
+     */
+    public void removeActivity(Activity activity) {
+        if (mActivityStack != null) {
+            Iterator<WeakReference<Activity>> iterator = mActivityStack.iterator();
+            while (iterator.hasNext()) {
+                WeakReference<Activity> stackActivity = iterator.next();
+                if (stackActivity.get() == null) {
+                    iterator.remove();
+                    continue;
+                }
+                if (stackActivity.get() == activity) {
+                    iterator.remove();
+                    break;
+                }
+            }
         }
     }
 
@@ -216,7 +239,7 @@ public class AppManager {
      *
      * @param cls 界面
      */
-    public void finishAllActivityExceptOne(Class cls) {
+    public void finishAllActivityOnlyOne(Class cls) {
         try {
             ListIterator<WeakReference<Activity>> listIterator = mActivityStack.listIterator();
             while (listIterator.hasNext()) {
@@ -240,7 +263,7 @@ public class AppManager {
      *
      * @param cls 界面
      */
-    public void finishAllActivityExceptOneAndTop(Class cls) {
+    public void finishAllActivityOnlyOneAndTop(Class cls) {
         WeakReference<Activity> activityWeakReference = mActivityStack.lastElement();
         Activity lastActivity = activityWeakReference.get();
         try {

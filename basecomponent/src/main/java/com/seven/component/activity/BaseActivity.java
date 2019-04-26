@@ -1,6 +1,7 @@
 package com.seven.component.activity;
 
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.AppBarLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.githang.statusbar.StatusBarCompat;
 import com.seven.component.R;
 import com.seven.framework.base.FrameworkActivity;
 import com.seven.framework.base.mvp.BasePresenter;
@@ -34,7 +36,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      */
     public abstract void onCreatPresenter();
 
-
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(R.layout.activity_base);
@@ -42,6 +43,24 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         setTitleView(R.layout.include_title);
         addContentView(layoutResID);
     }
+
+    /**
+     * 设置状态栏颜色
+     * @param color 颜色值
+     * @param lightStatusBar  是否高亮
+     */
+    public void setStatusBarColor(@ColorInt int color, boolean lightStatusBar) {
+        StatusBarCompat.setStatusBarColor(this, color, lightStatusBar);
+    }
+
+    /**
+     * 设置状态颜色
+     * @param color  颜色值
+     */
+    public void setStatusBarColor(@ColorInt int color) {
+        StatusBarCompat.setStatusBarColor(this, color);
+    }
+
 
     /**
      * base根View

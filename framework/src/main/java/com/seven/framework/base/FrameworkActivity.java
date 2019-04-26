@@ -1,26 +1,20 @@
 package com.seven.framework.base;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.seven.framework.inter.OnBackPressedListener;
-import com.seven.framework.manager.AppManager;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 public abstract class FrameworkActivity extends AppCompatActivity {
     public static String BUNDLE = "bundle";
-    private WeakReference<Activity> mActivityWeakReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivityWeakReference = new WeakReference<Activity>(this);
-        AppManager.getInstance().addActivity(mActivityWeakReference);
 
     }
 
@@ -149,12 +143,6 @@ public abstract class FrameworkActivity extends AppCompatActivity {
      */
     public Bundle getExtraBundle() {
         return getIntent().getBundleExtra(BUNDLE);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        AppManager.getInstance().removeActivity(mActivityWeakReference);
     }
 
     @Override
