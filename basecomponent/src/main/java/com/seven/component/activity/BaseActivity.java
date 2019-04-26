@@ -45,24 +45,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     }
 
     /**
-     * 设置状态栏颜色
-     * @param color 颜色值
-     * @param lightStatusBar  是否高亮
-     */
-    public void setStatusBarColor(@ColorInt int color, boolean lightStatusBar) {
-        StatusBarCompat.setStatusBarColor(this, color, lightStatusBar);
-    }
-
-    /**
-     * 设置状态颜色
-     * @param color  颜色值
-     */
-    public void setStatusBarColor(@ColorInt int color) {
-        StatusBarCompat.setStatusBarColor(this, color);
-    }
-
-
-    /**
      * base根View
      */
     private void findBaseView() {

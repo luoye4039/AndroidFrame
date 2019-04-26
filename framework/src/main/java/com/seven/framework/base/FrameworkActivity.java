@@ -2,9 +2,11 @@ package com.seven.framework.base;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
+import com.githang.statusbar.StatusBarCompat;
 import com.seven.framework.inter.OnBackPressedListener;
 
 import java.util.List;
@@ -12,10 +14,23 @@ import java.util.List;
 public abstract class FrameworkActivity extends AppCompatActivity {
     public static String BUNDLE = "bundle";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    /**
+     * 设置状态栏颜色
+     *
+     * @param color          颜色值
+     * @param lightStatusBar 是否高亮
+     */
+    public void setStatusBarColor(@ColorInt int color, boolean lightStatusBar) {
+        StatusBarCompat.setStatusBarColor(this, color, lightStatusBar);
+    }
 
+    /**
+     * 设置状态颜色
+     *
+     * @param color 颜色值
+     */
+    public void setStatusBarColor(@ColorInt int color) {
+        StatusBarCompat.setStatusBarColor(this, color);
     }
 
     /**
