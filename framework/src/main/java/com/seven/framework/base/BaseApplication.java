@@ -1,6 +1,7 @@
 package com.seven.framework.base;
 
-import android.support.multidex.MultiDexApplication;
+import android.app.Application;
+import android.support.multidex.MultiDex;
 
 import com.seven.framework.manager.AppManager;
 import com.seven.framework.utils.ToastUtil;
@@ -11,7 +12,7 @@ import java.util.Locale;
  * Base Application
  */
 
-public class BaseApplication extends MultiDexApplication {
+public class BaseApplication extends Application {
     public static AppManager sAppManager;
     public static Locale sAppLanguage = Locale.SIMPLIFIED_CHINESE;//app语言
     public static BaseApplication sBaseApplication;
@@ -19,6 +20,7 @@ public class BaseApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        MultiDex.install(this);
         sAppManager = AppManager.getInstance();
         sBaseApplication = this;
     }
