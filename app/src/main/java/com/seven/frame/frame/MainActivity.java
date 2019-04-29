@@ -6,9 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.seven.component.activity.BaseActivity;
-import com.seven.component.dialog.CommonDialogFragment;
-import com.seven.framework.base.FrameworkActivity;
-import com.seven.framework.manager.AppNotifycationManager;
+import com.seven.framework.widget.appnotifycation.AppNotifycationManager;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -53,7 +51,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 TextView textView = new TextView(this);
                 textView.setText("测试下哈哈");
                 textView.setTextSize(50);
-                textView.setBackgroundColor(Color.BLUE);
+                textView.setBackgroundColor(Color.RED);
                 AppNotifycationManager.getInstance().addShowView(textView);
                 break;
 

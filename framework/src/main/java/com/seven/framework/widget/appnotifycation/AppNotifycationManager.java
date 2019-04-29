@@ -1,19 +1,19 @@
-package com.seven.framework.manager;
+package com.seven.framework.widget.appnotifycation;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -26,14 +26,16 @@ import io.reactivex.schedulers.Schedulers;
  * App内通知
  */
 public class AppNotifycationManager implements Application.ActivityLifecycleCallbacks {
-    private long mShowTime = 1000 * 4;
+    private long mShowTime;
     private static AppNotifycationManager sAppNotifycationManager;
+    private Application mApplication;
     private View mCurrentShowView;//当前需要显示的view
-    private ArrayBlockingQueue<View> mViewArrayBlockingQueue = new ArrayBlockingQueue<View>(20);
+    private LinkedBlockingDeque<View> mViewLinkedBlockingDeque = new LinkedBlockingDeque<View>(100);
     private Disposable mLoopQueueDisposable;
     private Activity mCurrentShowActivity;
-    private TranslateAnimation mEnterTranslateAnimation;
-    private TranslateAnimation mOutTranslateAnimation;
+    private Animation mEnterAnimation;//进入动画
+    private Animation mOutAnimation;//退出动画
+    private AlphaAnimation mProtectionAnimation;//view移除时保留动画
 
     private AppNotifycationManager() {
     }
@@ -55,21 +57,39 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
      */
     public void init(Application application) {
         application.registerActivityLifecycleCallbacks(this);
-        mEnterTranslateAnimation = new TranslateAnimation(0, 0, -100, 0);
-        mEnterTranslateAnimation.setDuration(300);
-        mOutTranslateAnimation = new TranslateAnimation(0, 0, 0, -100);
-        mOutTranslateAnimation.setDuration(300);
+        TranslateAnimation enterTranslateAnimation = new TranslateAnimation(0, 0, -100, 0);
+        enterTranslateAnimation.setDuration(300);
+        TranslateAnimation outTranslateAnimation = new TranslateAnimation(0, 0, 0, -100);
+        outTranslateAnimation.setDuration(200);
+        AppNotifycationConfig appNotifycationConfig = new AppNotifycationConfig.Builder()
+                .setShowTime(4 * 1000)
+                .setEnterAnimation(enterTranslateAnimation)
+                .setOutAnimation(outTranslateAnimation)
+                .build();
+
+        init(application, appNotifycationConfig);
     }
 
     /**
      * 初始化消息通知
      *
      * @param application application
-     * @param showTime    显示的时间
      */
-    public void init(Application application, long showTime) {
+    public void init(Application application, AppNotifycationConfig appNotifycationConfig) {
         application.registerActivityLifecycleCallbacks(this);
-        mShowTime = showTime;
+        mApplication = application;
+        mShowTime = appNotifycationConfig.getShowTime();
+        mEnterAnimation = appNotifycationConfig.getEnterAnimation();
+        mOutAnimation = appNotifycationConfig.getOutAnimation();
+        initAnimotion();
+    }
+
+    /**
+     * 初始化过渡动画
+     */
+    private void initAnimotion() {
+        mProtectionAnimation = new AlphaAnimation(100, 90);
+        mProtectionAnimation.setDuration(200);
     }
 
 
@@ -79,18 +99,42 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
      * @param view 显示是view
      */
     public void addShowView(View view) {
-        mViewArrayBlockingQueue.add(view);
-        loopQueue();
+        if (mViewLinkedBlockingDeque.remainingCapacity() > 0) {
+            if (mViewLinkedBlockingDeque.offer(view))
+                loopQueue();
+        }
     }
 
     /**
      * 添加需要显示的view到队列中
      *
-     * @param context  context
      * @param layoutId view布局
      */
-    public void addShowView(Context context, @LayoutRes int layoutId) {
-        View inflate = LayoutInflater.from(context).inflate(layoutId, null);
+    public void addShowView(@LayoutRes int layoutId) {
+        View inflate = LayoutInflater.from(mApplication).inflate(layoutId, null);
+        addShowView(inflate);
+    }
+
+
+    /**
+     * 添加需要显示的view到队列中
+     *
+     * @param view 显示是view
+     */
+    public void setShowView(View view) {
+        if (mViewLinkedBlockingDeque.remainingCapacity() > 0) {
+            mViewLinkedBlockingDeque.push(view);
+            loopQueue();
+        }
+    }
+
+    /**
+     * 添加需要显示的view到队列中
+     *
+     * @param layoutId view布局
+     */
+    public void setShowView(@LayoutRes int layoutId) {
+        View inflate = LayoutInflater.from(mApplication).inflate(layoutId, null);
         addShowView(inflate);
     }
 
@@ -106,10 +150,10 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
                     .subscribe(new Consumer<Long>() {
                         @Override
                         public void accept(Long aLong) throws Exception {
-                            dismissView();
-                            View pollView = mViewArrayBlockingQueue.poll();
+                            dismissView(mOutAnimation);
+                            View pollView = mViewLinkedBlockingDeque.poll();
                             if (pollView != null) {
-                                showViewToActivity(pollView, mEnterTranslateAnimation);
+                                showViewToActivity(pollView, mEnterAnimation);
                             } else {
                                 mLoopQueueDisposable.dispose();
                                 mLoopQueueDisposable = null;
@@ -126,7 +170,7 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
      * @param view      view
      * @param animation 动画
      */
-    private void showViewToActivity(View view, Animation animation) {
+    private synchronized void showViewToActivity(View view, Animation animation) {
         if (mCurrentShowActivity != null) {
             FrameLayout mRootView = mCurrentShowActivity.findViewById(android.R.id.content);
             ViewParent parent = view.getParent();
@@ -134,9 +178,8 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
                 ViewGroup viewGroup = (ViewGroup) parent;
                 viewGroup.removeView(view);
             }
-            if (animation != null) {
+            if (animation != null)
                 view.startAnimation(animation);
-            }
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams
                     (FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
             mRootView.addView(view, layoutParams);
@@ -147,7 +190,7 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
     /**
      * 关闭显示的通知
      */
-    private void dismissView() {
+    private void dismissView(Animation animation) {
         if (mCurrentShowActivity != null && mCurrentShowView != null) {
             FrameLayout mRootView = mCurrentShowActivity.findViewById(android.R.id.content);
             int childCount = mRootView.getChildCount();
@@ -155,8 +198,8 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
                 for (int count = childCount; count > 0; count--) {
                     View childAt = mRootView.getChildAt(count);
                     if (childAt == mCurrentShowView) {
-                        if (mOutTranslateAnimation != null)
-                            mCurrentShowView.startAnimation(mOutTranslateAnimation);
+                        if (animation != null)
+                            mCurrentShowView.startAnimation(animation);
                         mRootView.removeView(mCurrentShowView);
                         break;
                     }
@@ -182,15 +225,15 @@ public class AppNotifycationManager implements Application.ActivityLifecycleCall
 
     @Override
     public void onActivityStarted(Activity activity) {
-
-    }
-
-    @Override
-    public void onActivityResumed(Activity activity) {
         mCurrentShowActivity = activity;
         if (mCurrentShowView != null) {
             showViewToActivity(mCurrentShowView, null);
         }
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+
     }
 
     @Override
