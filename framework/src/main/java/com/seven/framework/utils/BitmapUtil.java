@@ -10,8 +10,10 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.View;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -542,4 +544,28 @@ public class BitmapUtil {
         }
     }
 
+
+    /**
+     *
+     * @param view
+     * @return
+     */
+    public static Bitmap getViewBitmapWithoutBottom(View view) {
+        if (null == view) {
+            return null;
+        }
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        if (Build.VERSION.SDK_INT >= 11) {
+            view.measure(View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(view.getHeight(), View.MeasureSpec.EXACTLY));
+            view.layout((int) view.getX(), (int) view.getY(), (int) view.getX() + view.getMeasuredWidth(), (int) view.getY() + view.getMeasuredHeight());
+        } else {
+            view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        }
+        Bitmap bp = Bitmap.createBitmap(view.getDrawingCache(), 0, 0, view.getMeasuredWidth(), view.getMeasuredHeight() - view.getPaddingBottom());
+        view.setDrawingCacheEnabled(false);
+        view.destroyDrawingCache();
+        return bp;
+    }
 }
